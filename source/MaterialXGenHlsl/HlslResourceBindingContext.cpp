@@ -18,6 +18,9 @@ HlslResourceBindingContext::HlslResourceBindingContext(
     _hwInitUniformBindLocation(uniformBindingLocation),
     _hwInitSamplerBindLocation(samplerBindingLocation)
 {
+    // Initialize runtime binding locations to match initial values
+    _hwUniformBindLocation = _hwInitUniformBindLocation;
+    _hwSamplerBindLocation = _hwInitSamplerBindLocation;
 }
 
 void HlslResourceBindingContext::initialize()
