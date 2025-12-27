@@ -44,7 +44,7 @@ class MX_GENHLSL_API HlslShaderGenerator : public HwShaderGenerator
     const string& getTarget() const override { return TARGET; }
 
     /// Return the version string for the HLSL version this generator is for
-    const string& getVersion() const override { return VERSION; }
+    const string& getVersion() const { return VERSION; }
 
     /// Emit a shader variable.
     void emitVariableDeclaration(const ShaderPort* variable, const string& qualifier, GenContext& context, ShaderStage& stage,
@@ -61,26 +61,26 @@ class MX_GENHLSL_API HlslShaderGenerator : public HwShaderGenerator
     static const string VERSION;
 
   protected:
-    void emitVertexStage(const ShaderGraph& graph, GenContext& context, ShaderStage& stage) const override;
-    void emitPixelStage(const ShaderGraph& graph, GenContext& context, ShaderStage& stage) const override;
+    void emitVertexStage(const ShaderGraph& graph, GenContext& context, ShaderStage& stage) const;
+    void emitPixelStage(const ShaderGraph& graph, GenContext& context, ShaderStage& stage) const;
 
-    void emitDirectives(GenContext& context, ShaderStage& stage) const override;
-    void emitConstants(GenContext& context, ShaderStage& stage) const override;
-    void emitUniforms(GenContext& context, ShaderStage& stage) const override;
-    void emitLightData(GenContext& context, ShaderStage& stage) const override;
-    void emitInputs(GenContext& context, ShaderStage& stage) const override;
-    void emitOutputs(GenContext& context, ShaderStage& stage) const override;
+    void emitDirectives(GenContext& context, ShaderStage& stage) const;
+    void emitConstants(GenContext& context, ShaderStage& stage) const;
+    void emitUniforms(GenContext& context, ShaderStage& stage) const;
+    void emitLightData(GenContext& context, ShaderStage& stage) const;
+    void emitInputs(GenContext& context, ShaderStage& stage) const;
+    void emitOutputs(GenContext& context, ShaderStage& stage) const;
 
-    HwResourceBindingContextPtr getResourceBindingContext(GenContext& context) const override;
+    HwResourceBindingContextPtr getResourceBindingContext(GenContext& context) const;
 
     /// Emit specular environment lookup code
-    void emitSpecularEnvironment(GenContext& context, ShaderStage& stage) const override;
+    void emitSpecularEnvironment(GenContext& context, ShaderStage& stage) const;
 
     /// Emit transmission rendering code
-    void emitTransmissionRender(GenContext& context, ShaderStage& stage) const override;
+    void emitTransmissionRender(GenContext& context, ShaderStage& stage) const;
 
     /// Emit function definitions for lighting code
-    void emitLightFunctionDefinitions(const ShaderGraph& graph, GenContext& context, ShaderStage& stage) const override;
+    void emitLightFunctionDefinitions(const ShaderGraph& graph, GenContext& context, ShaderStage& stage) const;
 
     /// Nodes used internally for light sampling.
     vector<ShaderNodePtr> _lightSamplingNodes;
