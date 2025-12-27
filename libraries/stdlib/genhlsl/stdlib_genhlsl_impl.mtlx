@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<materialx version="1.38" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  
+  <!-- HLSL Standard Library Implementations -->
+  <!-- This file maps nodedef declarations to HLSL implementations -->
+  
+  <!-- Conversion Nodes -->
+  <nodegraph name="IM_convert_float_color3_genhlsl" nodedef="IM_convert_float_color3_genhlsl">
+    <convert name="out" type="color3">
+      <input name="in" type="float" nodename="in1"/>
+    </convert>
+  </nodegraph>
+  
+  <nodegraph name="IM_convert_float_color4_genhlsl" nodedef="IM_convert_float_color4_genhlsl">
+    <convert name="out" type="color4">
+      <input name="in" type="float" nodename="in1"/>
+    </convert>
+  </nodegraph>
+  
+  <nodegraph name="IM_convert_color3_float_genhlsl" nodedef="IM_convert_color3_float_genhlsl">
+    <convert name="out" type="float">
+      <input name="in" type="color3" nodename="in1"/>
+    </convert>
+  </nodegraph>
+  
+  <nodegraph name="IM_convert_color4_float_genhlsl" nodedef="IM_convert_color4_float_genhlsl">
+    <convert name="out" type="float">
+      <input name="in" type="color4" nodename="in1"/>
+    </convert>
+  </nodegraph>
+  
+  <nodegraph name="IM_convert_color3_color4_genhlsl" nodedef="IM_convert_color3_color4_genhlsl">
+    <convert name="out" type="color4">
+      <input name="in" type="color3" nodename="in1"/>
+    </convert>
+  </nodegraph>
+  
+  <nodegraph name="IM_convert_color4_color3_genhlsl" nodedef="IM_convert_color4_color3_genhlsl">
+    <convert name="out" type="color3">
+      <input name="in" type="color4" nodename="in1"/>
+    </convert>
+  </nodegraph>
+  
+  <!-- Image Nodes -->
+  <nodegraph name="IM_image_float_genhlsl" nodedef="IM_image_float_genhlsl">
+    <image name="out" type="float">
+      <input name="file" type="filename" nodename="file"/>
+      <input name="uv" type="vector2" nodename="uv"/>
+      <input name="uaddressmode" type="integer" nodename="uaddressmode"/>
+      <input name="vaddressmode" type="integer" nodename="vaddressmode"/>
+      <input name="filtertype" type="integer" nodename="filtertype"/>
+      <input name="wrapu" type="float" nodename="wrapu"/>
+      <input name="wrapv" type="float" nodename="wrapv"/>
+      <input name="framerange" type="vector2" nodename="framerange"/>
+      <input name="frameoffset" type="float" nodename="frameoffset"/>
+    </image>
+  </nodegraph>
+  
+  <nodegraph name="IM_image_color3_genhlsl" nodedef="IM_image_color3_genhlsl">
+    <image name="out" type="color3">
+      <input name="file" type="filename" nodename="file"/>
+      <input name="uv" type="vector2" nodename="uv"/>
+      <input name="uaddressmode" type="integer" nodename="uaddressmode"/>
+      <input name="vaddressmode" type="integer" nodename="vaddressmode"/>
+      <input name="filtertype" type="integer" nodename="filtertype"/>
+      <input name="wrapu" type="float" nodename="wrapu"/>
+      <input name="wrapv" type="float" nodename="wrapv"/>
+      <input name="framerange" type="vector2" nodename="framerange"/>
+      <input name="frameoffset" type="float" nodename="frameoffset"/>
+    </image>
+  </nodegraph>
+  
+  <nodegraph name="IM_image_color4_genhlsl" nodedef="IM_image_color4_genhlsl">
+    <image name="out" type="color4">
+      <input name="file" type="filename" nodename="file"/>
+      <input name="uv" type="vector2" nodename="uv"/>
+      <input name="uaddressmode" type="integer" nodename="uaddressmode"/>
+      <input name="vaddressmode" type="integer" nodename="vaddressmode"/>
+      <input name="filtertype" type="integer" nodename="filtertype"/>
+      <input name="wrapu" type="float" nodename="wrapu"/>
+      <input name="wrapv" type="float" nodename="wrapv"/>
+      <input name="framerange" type="vector2" nodename="framerange"/>
+      <input name="frameoffset" type="float" nodename="frameoffset"/>
+    </image>
+  </nodegraph>
+  
+  <nodegraph name="IM_image_vector2_genhlsl" nodedef="IM_image_vector2_genhlsl">
+    <image name="out" type="vector2">
+      <input name="file" type="filename" nodename="file"/>
+      <input name="uv" type="vector2" nodename="uv"/>
+      <input name="uaddressmode" type="integer" nodename="uaddressmode"/>
+      <input name="vaddressmode" type="integer" nodename="vaddressmode"/>
+      <input name="filtertype" type="integer" nodename="filtertype"/>
+      <input name="wrapu" type="float" nodename="wrapu"/>
+      <input name="wrapv" type="float" nodename="wrapv"/>
+      <input name="framerange" type="vector2" nodename="framerange"/>
+      <input name="frameoffset" type="float" nodename="frameoffset"/>
+    </image>
+  </nodegraph>
+  
+  <nodegraph name="IM_image_vector3_genhlsl" nodedef="IM_image_vector3_genhlsl">
+    <image name="out" type="vector3">
+      <input name="file" type="filename" nodename="file"/>
+      <input name="uv" type="vector2" nodename="uv"/>
+      <input name="uaddressmode" type="integer" nodename="uaddressmode"/>
+      <input name="vaddressmode" type="integer" nodename="vaddressmode"/>
+      <input name="filtertype" type="integer" nodename="filtertype"/>
+      <input name="wrapu" type="float" nodename="wrapu"/>
+      <input name="wrapv" type="float" nodename="wrapv"/>
+      <input name="framerange" type="vector2" nodename="framerange"/>
+      <input name="frameoffset" type="float" nodename="frameoffset"/>
+    </image>
+  </nodegraph>
+  
+  <nodegraph name="IM_image_vector4_genhlsl" nodedef="IM_image_vector4_genhlsl">
+    <image name="out" type="vector4">
+      <input name="file" type="filename" nodename="file"/>
+      <input name="uv" type="vector2" nodename="uv"/>
+      <input name="uaddressmode" type="integer" nodename="uaddressmode"/>
+      <input name="vaddressmode" type="integer" nodename="vaddressmode"/>
+      <input name="filtertype" type="integer" nodename="filtertype"/>
+      <input name="wrapu" type="float" nodename="wrapu"/>
+      <input name="wrapv" type="float" nodename="wrapv"/>
+      <input name="framerange" type="vector2" nodename="framerange"/>
+      <input name="frameoffset" type="float" nodename="frameoffset"/>
+    </image>
+  </nodegraph>
+  
+</materialx>
