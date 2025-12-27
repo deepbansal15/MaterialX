@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<materialx version="1.38" colorscheme="default">
+  <!-- HLSL Light Shader Implementations -->
+  
+  <!-- Directional Light -->
+  <nodegraph name="IM_directional_light_genhlsl" nodedef="ND_directional_light">
+    <constant name="intensityVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="directionVal" type="vector3">
+      <parameter name="value" type="vector3" value="0.0, -1.0, 0.0" />
+    </constant>
+    <output name="out" type="lightshader" />
+  </nodegraph>
+
+  <!-- Point Light -->
+  <nodegraph name="IM_point_light_genhlsl" nodedef="ND_point_light">
+    <constant name="intensityVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="positionVal" type="vector3">
+      <parameter name="value" type="vector3" value="0.0, 0.0, 0.0" />
+    </constant>
+    <output name="out" type="lightshader" />
+  </nodegraph>
+
+  <!-- Spot Light -->
+  <nodegraph name="IM_spot_light_genhlsl" nodedef="ND_spot_light">
+    <constant name="intensityVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="positionVal" type="vector3">
+      <parameter name="value" type="vector3" value="0.0, 0.0, 0.0" />
+    </constant>
+    <constant name="directionVal" type="vector3">
+      <parameter name="value" type="vector3" value="0.0, -1.0, 0.0" />
+    </constant>
+    <constant name="outerAngleVal" type="float">
+      <parameter name="value" type="float" value="45.0" />
+    </constant>
+    <constant name="innerAngleVal" type="float">
+      <parameter name="value" type="float" value="30.0" />
+    </constant>
+    <output name="out" type="lightshader" />
+  </nodegraph>
+
+</materialx>

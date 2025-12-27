@@ -650,29 +650,34 @@ void HlslShaderGenerator::emitLightFunctionDefinitions(const ShaderGraph& graph,
 }
 
 void HlslShaderGenerator::emitVariableDeclaration(const ShaderPort* variable, const string& qualifier,
-                                                  GenContext&, ShaderStage& stage,
+                                                  GenContext& context, ShaderStage& stage,
                                                   bool assignValue) const
 {
     // A file texture input needs special handling on HLSL
     if (variable->getType() == Type::FILENAME)
     {
+        // Get the resource binding context for sampler binding locations
+        HwResourceBindingContextPtr resourceBindingCtx = getResourceBindingContext(context);
+        
         // For textures, we declare both Texture2D and SamplerState
         string str = qualifier.empty() ? EMPTY_STRING : qualifier + " ";
         emitString(str + "Texture2D " + variable->getVariable(), stage);
         
-        // Check if this is a function parameter (would be handled differently)
-        // For now, assume register binding for global declarations
-        if (!qualifier.empty() || !assignValue)
+        // Use resource binding context for register binding if available
+        // Otherwise, use a simple default binding (t0, s0)
+        if (resourceBindingCtx)
         {
-            emitString(" : register(t" + std::to_string(_hwSamplerBindLocation) + ")", stage);
+            // The binding context will handle register assignments through emitResourceBindings
+            emitLineEnd(stage, true);
         }
-        emitLineEnd(stage, true);
+        else
+        {
+            // Fallback: no register binding (binding will be set at shader creation time)
+            emitLineEnd(stage, true);
+        }
         
         emitString(str + "SamplerState " + variable->getVariable() + "_sampler", stage);
-        if (!qualifier.empty() || !assignValue)
-        {
-            emitString(" : register(s" + std::to_string(_hwSamplerBindLocation++) + ")", stage);
-        }
+        emitLineEnd(stage, true);
     }
     else
     {

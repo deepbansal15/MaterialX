@@ -84,9 +84,6 @@ class MX_GENHLSL_API HlslShaderGenerator : public HwShaderGenerator
 
     /// Nodes used internally for light sampling.
     vector<ShaderNodePtr> _lightSamplingNodes;
-
-    /// Binding location counter for samplers
-    mutable size_t _hwSamplerBindLocation = 0;
 };
 
 MATERIALX_NAMESPACE_END

@@ -1,0 +1,300 @@
+<?xml version="1.0"?>
+<materialx version="1.38" colorscheme="default">
+  <!-- PBR Library HLSL Implementations -->
+  
+  <!-- BSDF Implementations -->
+  
+  <!-- Diffuse Reflection BSDF -->
+  <nodegraph name="IM_diffuse_bsdf_genhlsl" nodedef="ND_diffuse_bsdf">
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="0.5, 0.5, 0.5" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Dielectric BSDF -->
+  <nodegraph name="IM_dielectric_bsdf_genhlsl" nodedef="ND_dielectric_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="iorVal" type="float">
+      <parameter name="value" type="float" value="1.5" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Conductor BSDF -->
+  <nodegraph name="IM_conductor_bsdf_genhlsl" nodedef="ND_conductor_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="iorVal" type="float">
+      <parameter name="value" type="float" value="0.14" />
+    </constant>
+    <constant name="extinctionVal" type="float">
+      <parameter name="value" type="float" value="3.5" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Generalized Schlick BSDF -->
+  <nodegraph name="IM_generalized_schlick_bsdf_genhlsl" nodedef="ND_generalized_schlick_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="color0Val" type="color3">
+      <parameter name="value" type="color3" value="0.04, 0.04, 0.04" />
+    </constant>
+    <constant name="color90Val" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Burley Diffuse BSDF -->
+  <nodegraph name="IM_burley_diffuse_bsdf_genhlsl" nodedef="ND_burley_diffuse_bsdf">
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="0.5, 0.5, 0.5" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Oren-Nayar Diffuse BSDF -->
+  <nodegraph name="IM_oren_nayar_diffuse_bsdf_genhlsl" nodedef="ND_oren_nayar_diffuse_bsdf">
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="0.5, 0.5, 0.5" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Sheen BSDF -->
+  <nodegraph name="IM_sheen_bsdf_genhlsl" nodedef="ND_sheen_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Subsurface BSDF -->
+  <nodegraph name="IM_subsurface_bsdf_genhlsl" nodedef="ND_subsurface_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="0.5, 0.5, 0.5" />
+    </constant>
+    <constant name="radiusVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Translucent BSDF -->
+  <nodegraph name="IM_translucent_bsdf_genhlsl" nodedef="ND_translucent_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Microfacet BSDF -->
+  <nodegraph name="IM_microfacet_bsdf_genhlsl" nodedef="ND_microfacet_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="reflectionVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <constant name="transmissionVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <constant name="iorVal" type="float">
+      <parameter name="value" type="float" value="1.5" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.2" />
+    </constant>
+    <constant name="modeVal" type="integer">
+      <parameter name="value" type="integer" value="0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- EDF Implementations -->
+
+  <!-- Uniform EDF -->
+  <nodegraph name="IM_uniform_edf_genhlsl" nodedef="ND_uniform_edf">
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <output name="out" type="edf" />
+  </nodegraph>
+
+  <!-- Generalized Schlick EDF -->
+  <nodegraph name="IM_generalized_schlick_edf_genhlsl" nodedef="ND_generalized_schlick_edf">
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <constant name="roughnessVal" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <output name="out" type="edf" />
+  </nodegraph>
+
+  <!-- VDF Implementations -->
+
+  <!-- Absorption VDF -->
+  <nodegraph name="IM_absorption_vdf_genhlsl" nodedef="ND_absorption_vdf">
+    <constant name="absorptionVal" type="color3">
+      <parameter name="value" type="color3" value="0.0, 0.0, 0.0" />
+    </constant>
+    <output name="out" type="vdf" />
+  </nodegraph>
+
+  <!-- Mixing Functions -->
+
+  <!-- Add BSDF -->
+  <nodegraph name="IM_add_bsdf_genhlsl" nodedef="ND_add_bsdf">
+    <input name="in1" type="bsdf" />
+    <input name="in2" type="bsdf" />
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Mix BSDF -->
+  <nodegraph name="IM_mix_bsdf_genhlsl" nodedef="ND_mix_bsdf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <input name="in1" type="bsdf" />
+    <input name="in2" type="bsdf" />
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Multiply BSDF Color3 -->
+  <nodegraph name="IM_multiply_bsdf_color3_genhlsl" nodedef="ND_multiply_bsdf_color3">
+    <input name="in" type="bsdf" />
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Multiply BSDF Float -->
+  <nodegraph name="IM_multiply_bsdf_float_genhlsl" nodedef="ND_multiply_bsdf_float">
+    <input name="in" type="bsdf" />
+    <constant name="amountVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Mix EDF -->
+  <nodegraph name="IM_mix_edf_genhlsl" nodedef="ND_mix_edf">
+    <constant name="weightVal" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <input name="in1" type="edf" />
+    <input name="in2" type="edf" />
+    <output name="out" type="edf" />
+  </nodegraph>
+
+  <!-- Multiply EDF Color3 -->
+  <nodegraph name="IM_multiply_edf_color3_genhlsl" nodedef="ND_multiply_edf_color3">
+    <input name="in" type="edf" />
+    <constant name="colorVal" type="color3">
+      <parameter name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <output name="out" type="edf" />
+  </nodegraph>
+
+  <!-- Multiply EDF Float -->
+  <nodegraph name="IM_multiply_edf_float_genhlsl" nodedef="ND_multiply_edf_float">
+    <input name="in" type="edf" />
+    <constant name="amountVal" type="float">
+      <parameter name="value" type="float" value="1.0" />
+    </constant>
+    <output name="out" type="edf" />
+  </nodegraph>
+
+  <!-- Layer BSDF -->
+  <nodegraph name="IM_layer_bsdf_genhlsl" nodedef="ND_layer_bsdf">
+    <input name="layer" type="bsdf" />
+    <input name="base" type="bsdf" />
+    <output name="out" type="bsdf" />
+  </nodegraph>
+
+  <!-- Layer VDF -->
+  <nodegraph name="IM_layer_vdf_genhlsl" nodedef="ND_layer_vdf">
+    <input name="layer" type="vdf" />
+    <input name="base" type="vdf" />
+    <output name="out" type="vdf" />
+  </nodegraph>
+
+  <!-- Displacement -->
+  <nodegraph name="IM_displacement_float_genhlsl" nodedef="ND_displacement_float">
+    <input name="displacement" type="float" />
+    <input name="scale" type="float" />
+    <output name="out" type="displacementshader" />
+  </nodegraph>
+
+  <nodegraph name="IM_displacement_vector3_genhlsl" nodedef="ND_displacement_vector3">
+    <input name="displacement" type="vector3" />
+    <input name="scale" type="float" />
+    <output name="out" type="displacementshader" />
+  </nodegraph>
+
+  <!-- Anisotropy -->
+  <nodegraph name="IM_anisotropy_genhlsl" nodedef="ND_anisotropy">
+    <constant name="amountVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <constant name="angleVal" type="float">
+      <parameter name="value" type="float" value="0.0" />
+    </constant>
+    <input name="in" type="float" />
+    <output name="out" type="float" />
+  </nodegraph>
+
+  <!-- Dual Roughness -->
+  <nodegraph name="IM_roughness_dual_genhlsl" nodedef="ND_roughness_dual">
+    <constant name="roughness1Val" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <constant name="roughness2Val" type="float">
+      <parameter name="value" type="float" value="0.5" />
+    </constant>
+    <input name="in" type="float" />
+    <output name="out" type="float" />
+  </nodegraph>
+
+</materialx>
