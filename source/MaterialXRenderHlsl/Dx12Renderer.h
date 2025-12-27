@@ -44,6 +44,10 @@ class MX_RENDERHLSL_API Dx12Renderer : public ShaderRenderer
     /// Get the Direct3D 12 root signature
     ID3D12RootSignature* getRootSignature() const { return _rootSignature.Get(); }
 
+    /// Create a command list for texture uploads
+    /// Returns S_OK on success, the caller must call Release on the command list
+    HRESULT createCommandList(ID3D12GraphicsCommandList** commandList);
+
   protected:
     /// Constructor
     Dx12Renderer();

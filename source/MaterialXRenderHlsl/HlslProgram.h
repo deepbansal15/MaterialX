@@ -12,6 +12,7 @@
 #include <MaterialXCore/Value.h>
 
 #include <d3d12.h>
+#include <d3dcompiler.h>
 #include <wrl.h>
 
 #include <string>
@@ -38,11 +39,17 @@ class MX_RENDERHLSL_API HlslProgram
     /// Compile a pixel shader from source code
     bool compilePixelShader(const std::string& source, const std::string& entryPoint = "PS_Main");
 
-    /// Get the compiled vertex shader
-    ID3D12VertexShader* getVertexShader() const { return _vertexShader.Get(); }
+    /// Get the compiled vertex shader bytecode
+    ID3DBlob* getVertexShaderBytecode() const { return _vertexShader.Get(); }
 
-    /// Get the compiled pixel shader
-    ID3D12PixelShader* getPixelShader() const { return _pixelShader.Get(); }
+    /// Get the vertex shader bytecode size
+    size_t getVertexShaderBytecodeSize() const { return _vertexShader ? _vertexShader->GetBufferSize() : 0; }
+
+    /// Get the compiled pixel shader bytecode
+    ID3DBlob* getPixelShaderBytecode() const { return _pixelShader.Get(); }
+
+    /// Get the pixel shader bytecode size
+    size_t getPixelShaderBytecodeSize() const { return _pixelShader ? _pixelShader->GetBufferSize() : 0; }
 
     /// Check if the program has a vertex shader
     bool hasVertexShader() const { return _vertexShader != nullptr; }
@@ -67,11 +74,14 @@ class MX_RENDERHLSL_API HlslProgram
     HlslProgram();
 
     /// Compile a shader
-    bool compileShader(ID3DBlob** shaderBlob, const std::string& source, 
+    bool compileShader(ID3DBlob** shaderBlob, const std::string& source,
                        const std::string& entryPoint, const std::string& target);
 
-    Microsoft::WRL::ComPtr<ID3D12VertexShader> _vertexShader;
-    Microsoft::WRL::ComPtr<ID3D12PixelShader> _pixelShader;
+    /// Vertex shader bytecode (using ID3DBlob - DirectX 12 doesn't have ID3D12VertexShader)
+    Microsoft::WRL::ComPtr<ID3DBlob> _vertexShader;
+
+    /// Pixel shader bytecode (using ID3DBlob - DirectX 12 doesn't have ID3D12PixelShader)
+    Microsoft::WRL::ComPtr<ID3DBlob> _pixelShader;
 
     std::unordered_map<std::string, ValuePtr> _uniforms;
 };

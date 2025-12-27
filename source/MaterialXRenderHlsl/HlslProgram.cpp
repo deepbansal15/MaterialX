@@ -75,7 +75,8 @@ bool HlslProgram::compileVertexShader(const std::string& source, const std::stri
         return false;
     }
 
-    _vertexShader.Attach(reinterpret_cast<ID3D12VertexShader*>(shaderBlob.Detach()));
+    // DirectX 12 uses ID3DBlob for shader bytecode (no separate shader interface types)
+    _vertexShader = shaderBlob;
     return true;
 }
 
@@ -87,7 +88,8 @@ bool HlslProgram::compilePixelShader(const std::string& source, const std::strin
         return false;
     }
 
-    _pixelShader.Attach(reinterpret_cast<ID3D12PixelShader*>(shaderBlob.Detach()));
+    // DirectX 12 uses ID3DBlob for shader bytecode (no separate shader interface types)
+    _pixelShader = shaderBlob;
     return true;
 }
 

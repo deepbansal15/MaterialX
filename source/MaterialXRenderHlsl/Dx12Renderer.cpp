@@ -74,9 +74,54 @@ void Dx12Renderer::createDevice()
 
 void Dx12Renderer::createRootSignature()
 {
-    // Define a simple root signature with one descriptor table
+    // Define root parameters for the shader
+    // MaterialX shaders typically need:
+    // - Constant buffer for transformation matrices (b0)
+    // - Constant buffer for material parameters (b1)
+    // - Descriptor table for textures (t0-tN)
+    // - Descriptor table for samplers (s0-sN)
+
+    D3D12_ROOT_PARAMETER rootParameters[3];
+    D3D12_DESCRIPTOR_RANGE descriptorRanges[2];
+
+    // Descriptor range for textures (shader resource views)
+    descriptorRanges[0].BaseShaderRegister = 0;
+    descriptorRanges[0].NumDescriptors = 16;  // Support up to 16 textures
+    descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+
+    // Descriptor range for samplers
+    descriptorRanges[1].BaseShaderRegister = 0;
+    descriptorRanges[1].NumDescriptors = 8;  // Support up to 8 samplers
+    descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+    descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
+
+    // Root parameter 0: Descriptor table for textures
+    rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+    rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
+    rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+    // Root parameter 1: Descriptor table for samplers
+    rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+    rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+    rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
+    rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+    // Root parameter 2: 32-bit constants for simple uniform values
+    // Register b0, space 0
+    D3D12_ROOT_CONSTANTS constants = {};
+    constants.ShaderRegister = 0;
+    constants.RegisterSpace = 0;
+    constants.Num32BitValues = 16;  // 16 floats (4x4 matrix) for MVP
+    rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+    rootParameters[2].Constants = constants;
+    rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
+    // Define a root signature with the parameters
     D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-    rootSignatureDesc.NumParameters = 0;
+    rootSignatureDesc.NumParameters = 3;
+    rootSignatureDesc.pParameters = rootParameters;
     rootSignatureDesc.NumStaticSamplers = 0;
     rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
@@ -131,6 +176,21 @@ void Dx12Renderer::initialize(void* device, void* commandQueue)
 ImageHandlerPtr Dx12Renderer::createImageHandler()
 {
     return Dx12TextureHandler::create();
+}
+
+HRESULT Dx12Renderer::createCommandList(ID3D12GraphicsCommandList** commandList)
+{
+    if (!_device)
+    {
+        return E_FAIL;
+    }
+
+    return _device->CreateCommandList(
+        0,  // Node mask
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        nullptr,  // Allocator
+        nullptr,  // Initial pipeline state (can be set later)
+        IID_PPV_ARGS(commandList));
 }
 
 MATERIALX_NAMESPACE_END

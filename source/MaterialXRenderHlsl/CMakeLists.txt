@@ -3,6 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# MaterialXRenderHlsl only builds on Windows due to DirectX dependencies
+if(NOT WIN32)
+    return()
+endif()
+
+# Find DirectX dependencies
+find_package(directxheaders CONFIG REQUIRED)
+find_package(Microsoft.DirectX.Agility.SDK CONFIG REQUIRED)
+
 set(MATERIALX_RENDERHLSL_HEADERS
     Export.h
     Dx12Renderer.h
@@ -29,6 +38,8 @@ target_link_libraries(MaterialXRenderHlsl
     PUBLIC
         MaterialXRender
         MaterialXGenHlsl
+        directxheaders::directxheaders
+        Microsoft::DirectX.Agility.SDK
 )
 
 target_include_directories(MaterialXRenderHlsl

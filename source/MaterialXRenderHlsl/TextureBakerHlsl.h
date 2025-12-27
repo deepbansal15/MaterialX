@@ -9,7 +9,14 @@
 
 #include <MaterialXRender/TextureBaker.h>
 
+#include <memory>
+#include <unordered_map>
+
 MATERIALX_NAMESPACE_BEGIN
+
+// Forward declarations
+class ID3D12Device;
+class ID3D12GraphicsCommandList;
 
 /// Shared pointer to an HLSL Texture Baker
 using TextureBakerHlslPtr = std::shared_ptr<class TextureBakerHlsl>;
@@ -70,9 +77,26 @@ class MX_RENDER_HLSL_API TextureBakerHlsl : public TextureBaker
     /// Initialize the baker
     bool initialize() override;
 
+  public:
+    /// Set the D3D12 device and command list for texture creation
+    void setD3D12Device(ID3D12Device* device, ID3D12GraphicsCommandList* commandList)
+    {
+        _dx12Device = device;
+        _dx12CommandList = commandList;
+    }
+
   private:
     /// Helper to create a D3D12 texture resource
     bool createDx12Texture(const string& resourceId, const ImagePtr image);
+
+    /// D3D12 device for texture creation
+    ID3D12Device* _dx12Device;
+
+    /// D3D12 command list for texture creation
+    ID3D12GraphicsCommandList* _dx12CommandList;
+
+    /// Map of created textures
+    std::unordered_map<string, TexturePtr> _textures;
 };
 
 MATERIALX_NAMESPACE_END
