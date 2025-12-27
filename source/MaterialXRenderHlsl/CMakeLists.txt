@@ -15,6 +15,9 @@ find_package(Microsoft.DirectX.Agility.SDK CONFIG REQUIRED)
 set(MATERIALX_RENDERHLSL_HEADERS
     Export.h
     Dx12Renderer.h
+    Dx12Framebuffer.h
+    Dx12State.h
+    Dx12PipelineStateObject.h
     HlslMaterial.h
     HlslProgram.h
     Dx12TextureHandler.h
@@ -23,6 +26,9 @@ set(MATERIALX_RENDERHLSL_HEADERS
 
 set(MATERIALX_RENDERHLSL_SOURCES
     Dx12Renderer.cpp
+    Dx12Framebuffer.cpp
+    Dx12State.cpp
+    Dx12PipelineStateObject.cpp
     HlslMaterial.cpp
     HlslProgram.cpp
     Dx12TextureHandler.cpp

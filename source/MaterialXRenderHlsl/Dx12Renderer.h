@@ -48,6 +48,13 @@ class MX_RENDERHLSL_API Dx12Renderer : public ShaderRenderer
     /// Returns S_OK on success, the caller must call Release on the command list
     HRESULT createCommandList(ID3D12GraphicsCommandList** commandList);
 
+    /// Create a command allocator for command lists
+    /// Returns S_OK on success, the caller must call Release on the allocator
+    HRESULT createCommandAllocator(ID3D12CommandAllocator** allocator);
+
+    /// Wait for the GPU to complete all pending operations
+    void waitForGpu();
+
   protected:
     /// Constructor
     Dx12Renderer();
@@ -57,6 +64,12 @@ class MX_RENDERHLSL_API Dx12Renderer : public ShaderRenderer
 
     /// Create the root signature for shaders
     void createRootSignature();
+
+    /// Create a command allocator
+    HRESULT createCommandAllocator(ID3D12CommandAllocator** allocator);
+
+    /// Wait for the GPU to complete all pending commands
+    void waitForGpu();
 
     Microsoft::WRL::ComPtr<ID3D12Device> _device;
     Microsoft::WRL::ComPtr<ID3D12CommandQueue> _commandQueue;

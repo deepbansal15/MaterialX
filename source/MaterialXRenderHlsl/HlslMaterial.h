@@ -72,6 +72,15 @@ class MX_RENDERHLSL_API HlslMaterial : public ShaderMaterial
     /// Get the shader program
     HlslProgramPtr getProgram() const { return _program; }
 
+    /// Set the root signature for this material
+    void setRootSignature(ID3D12RootSignature* rootSignature);
+
+    /// Set the command list for this material
+    void setCommandList(ID3D12GraphicsCommandList* commandList);
+
+    /// Set the renderer for this material
+    void setRenderer(RendererPtr renderer);
+
   protected:
     /// Constructor
     HlslMaterial();

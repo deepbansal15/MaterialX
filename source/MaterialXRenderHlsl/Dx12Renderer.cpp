@@ -185,12 +185,70 @@ HRESULT Dx12Renderer::createCommandList(ID3D12GraphicsCommandList** commandList)
         return E_FAIL;
     }
 
-    return _device->CreateCommandList(
+    // Create a command allocator for this command list
+    ID3D12CommandAllocator* allocator = nullptr;
+    HRESULT hr = createCommandAllocator(&allocator);
+    if (FAILED(hr) || !allocator)
+    {
+        return hr;
+    }
+
+    // Create the command list with the allocator
+    hr = _device->CreateCommandList(
         0,  // Node mask
         D3D12_COMMAND_LIST_TYPE_DIRECT,
-        nullptr,  // Allocator
+        allocator,  // Allocator
         nullptr,  // Initial pipeline state (can be set later)
         IID_PPV_ARGS(commandList));
+
+    if (FAILED(hr))
+    {
+        allocator->Release();
+        return hr;
+    }
+
+    // The command list now owns the allocator reference
+    // The allocator will be released when the command list is released
+
+    return S_OK;
+}
+
+HRESULT Dx12Renderer::createCommandAllocator(ID3D12CommandAllocator** allocator)
+{
+    if (!_device)
+    {
+        return E_FAIL;
+    }
+
+    return _device->CreateCommandAllocator(
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        IID_PPV_ARGS(allocator));
+}
+
+void Dx12Renderer::waitForGpu()
+{
+    if (!_commandQueue || !_fence)
+    {
+        return;
+    }
+
+    // Signal the fence
+    _fenceValue++;
+    HRESULT hr = _commandQueue->Signal(_fence.Get(), _fenceValue);
+    if (FAILED(hr))
+    {
+        return;
+    }
+
+    // Wait for the fence to be signaled
+    if (_fence->GetCompletedValue() < _fenceValue)
+    {
+        hr = _fence->SetEventOnCompletion(_fenceValue, _fenceEvent);
+        if (SUCCEEDED(hr))
+        {
+            WaitForSingleObject(_fenceEvent, INFINITE);
+        }
+    }
 }
 
 MATERIALX_NAMESPACE_END

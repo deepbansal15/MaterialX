@@ -6,14 +6,19 @@
 #include <MaterialXRenderHlsl/HlslMaterial.h>
 #include <MaterialXRenderHlsl/Dx12Renderer.h>
 #include <MaterialXRenderHlsl/Dx12TextureHandler.h>
+#include <MaterialXRenderHlsl/Dx12MeshBuffer.h>
 
 #include <MaterialXGenShader/Shader.h>
+#include <MaterialXGenHw/HwConstants.h>
+
+#include <d3dx12.h>
 
 MATERIALX_NAMESPACE_BEGIN
 
 HlslMaterial::HlslMaterial() :
     _boundMesh(nullptr),
-    _hasTransparency(false)
+    _hasTransparency(false),
+    _worldMatrix(Matrix44::IDENTITY)
 {
 }
 
@@ -78,6 +83,7 @@ void HlslMaterial::bindShader()
 void HlslMaterial::unbindShader()
 {
     _program.reset();
+    _pipelineState.Reset();
 }
 
 void HlslMaterial::bindMesh(MeshPtr mesh)
@@ -114,7 +120,25 @@ void HlslMaterial::bindLighting(LightHandler* lightHandler, ImageHandlerPtr imag
     }
 
     // Bind light data uniforms
-    // This would be implemented based on the specific lighting model
+    // Get light count and light data from the light handler
+    size_t lightCount = lightHandler->getLightSources().size();
+    
+    // Set light count uniform
+    _program->setUniform(HW::NUM_ACTIVE_LIGHTS, Value::createValue<int>(static_cast<int>(lightCount)));
+
+    // For each light, set its properties
+    for (size_t i = 0; i < lightCount; ++i)
+    {
+        LightId lightId = static_cast<LightId>(i);
+        const LightShaderPtr light = lightHandler->getLightSource(lightId);
+        
+        if (light)
+        {
+            // Set light direction, color, intensity, etc.
+            // These would be set as uniforms with appropriate naming
+            // e.g., "u_lightDirection[0]", "u_lightColor[0]", etc.
+        }
+    }
 }
 
 void HlslMaterial::bindImages(ImageHandlerPtr imageHandler, const FileSearchPath& searchPath, bool flipV)
@@ -132,13 +156,21 @@ void HlslMaterial::bindImages(ImageHandlerPtr imageHandler, const FileSearchPath
     }
 
     // Store the image handler for use during rendering
-    // The actual texture binding to descriptor tables would happen in updateUniforms or drawPartition
-    // based on the shader's resource binding layout
+    _imageHandler = imageHandler;
+    _flipV = flipV;
+
+    // Bind textures to the shader
+    // This would iterate through the shader's uniform list and bind textures
+    // to the appropriate descriptor table slots
 }
 
 void HlslMaterial::unbindImages(ImageHandlerPtr imageHandler)
 {
-    // Unbind textures
+    if (imageHandler)
+    {
+        imageHandler->unbindImages();
+    }
+    _imageHandler.reset();
 }
 
 void HlslMaterial::drawPartition(MeshPartitionPtr partition)
@@ -151,16 +183,42 @@ void HlslMaterial::drawPartition(MeshPartitionPtr partition)
     // Set the pipeline state
     _commandList->SetPipelineState(_pipelineState.Get());
 
+    // Get the mesh buffer for this mesh
+    Dx12MeshBuffer* meshBuffer = _boundMesh->getUserData<Dx12MeshBuffer>();
+    if (!meshBuffer)
+    {
+        return;
+    }
+
     // Set the root signature
-    // Note: In a real implementation, you'd get the root signature from the renderer
-    // For now, this is a placeholder
+    _commandList->SetGraphicsRootSignature(_rootSignature.Get());
+
+    // Set vertex and index buffers
+    meshBuffer->bind(_commandList.Get());
+
+    // Set descriptor tables for textures and samplers
+    if (_imageHandler)
+    {
+        Dx12TextureHandler* dx12Handler = dynamic_cast<Dx12TextureHandler*>(_imageHandler.get());
+        if (dx12Handler)
+        {
+            // Set texture descriptor table
+            D3D12_GPU_DESCRIPTOR_HANDLE textureTable = dx12Handler->getTextureDescriptorTable();
+            _commandList->SetGraphicsRootDescriptorTable(0, textureTable);
+        }
+    }
+
+    // Set constant buffer for matrices
+    _commandList->SetGraphicsRoot32BitConstants(2, 16, _worldViewProjectionMatrix.data(), 0);
 
     // Draw the mesh partition
-    // The mesh partition contains the geometry data (vertex buffer, index buffer)
-    // In a full implementation, you'd:
-    // 1. Set vertex and index buffers
-    // 2. Set descriptor tables for textures and samplers
-    // 3. Draw indexed
+    const MeshIndexBuffer& indices = partition->getIndices();
+    _commandList->DrawIndexedInstanced(
+        static_cast<UINT>(indices.size()),
+        1,
+        0,
+        0,
+        0);
 }
 
 void HlslMaterial::createPipelineState()
@@ -232,7 +290,7 @@ void HlslMaterial::createPipelineState()
 
     // Describe the pipeline state
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-    psoDesc.pRootSignature = nullptr; // Would be set from the renderer
+    psoDesc.pRootSignature = _rootSignature.Get();
     psoDesc.VS = { vertexShader->GetBufferPointer(), vertexShader->GetBufferSize() };
     psoDesc.PS = { pixelShader->GetBufferPointer(), pixelShader->GetBufferSize() };
     psoDesc.BlendState = blendDesc;
@@ -247,8 +305,25 @@ void HlslMaterial::createPipelineState()
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleDesc.Quality = 0;
 
-    // Note: In a real implementation, you'd get the device from the renderer
-    // and create the pipeline state object. This is a placeholder structure.
+    // Get the device from the renderer
+    Dx12Renderer* renderer = dynamic_cast<Dx12Renderer*>(_renderer.get());
+    if (!renderer)
+    {
+        throw std::runtime_error("Invalid renderer for pipeline state creation");
+    }
+
+    ID3D12Device* device = renderer->getDevice();
+    if (!device)
+    {
+        throw std::runtime_error("Invalid D3D12 device for pipeline state creation");
+    }
+
+    // Create the pipeline state object
+    HRESULT hr = device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_pipelineState));
+    if (FAILED(hr))
+    {
+        throw std::runtime_error("Failed to create pipeline state object");
+    }
 }
 
 void HlslMaterial::updateUniforms()
@@ -270,6 +345,27 @@ void HlslMaterial::updateUniforms()
 
     // The actual implementation depends on the root signature layout
     // and how the shader declares its constant buffers
+
+    // For now, we set the MVP matrix as root constants
+    if (_commandList)
+    {
+        _commandList->SetGraphicsRoot32BitConstants(2, 16, _worldViewProjectionMatrix.data(), 0);
+    }
+}
+
+void HlslMaterial::setRootSignature(ID3D12RootSignature* rootSignature)
+{
+    _rootSignature = rootSignature;
+}
+
+void HlslMaterial::setCommandList(ID3D12GraphicsCommandList* commandList)
+{
+    _commandList = commandList;
+}
+
+void HlslMaterial::setRenderer(RendererPtr renderer)
+{
+    _renderer = renderer;
 }
 
 MATERIALX_NAMESPACE_END

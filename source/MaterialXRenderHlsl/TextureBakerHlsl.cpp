@@ -6,21 +6,36 @@
 
 #include <MaterialXRender/Image.h>
 #include <MaterialXRender/Renderer.h>
+#include <MaterialXRenderHlsl/Dx12Renderer.h>
+#include <MaterialXRenderHlsl/Dx12TextureHandler.h>
 
-#include <d3d12.h>
-#include <dxgi1_4.h>
+#include <MaterialXGenHw/HwShaderGenerator.h>
 
 MATERIALX_NAMESPACE_BEGIN
 
 TextureBakerHlsl::TextureBakerHlsl(RendererPtr renderer) :
     TextureBaker(renderer),
     _dx12Device(nullptr),
-    _dx12CommandList(nullptr)
+    _dx12CommandList(nullptr),
+    _dx12CommandAllocator(nullptr),
+    _dx12DescriptorHeap(nullptr),
+    _descriptorHeapSize(0)
 {
 }
 
 TextureBakerHlsl::~TextureBakerHlsl()
 {
+    // Release D3D12 resources
+    if (_dx12DescriptorHeap)
+    {
+        _dx12DescriptorHeap->Release();
+        _dx12DescriptorHeap = nullptr;
+    }
+    if (_dx12CommandAllocator)
+    {
+        _dx12CommandAllocator->Release();
+        _dx12CommandAllocator = nullptr;
+    }
 }
 
 TextureBakerHlslPtr TextureBakerHlsl::create(RendererPtr renderer)
@@ -30,7 +45,59 @@ TextureBakerHlslPtr TextureBakerHlsl::create(RendererPtr renderer)
 
 bool TextureBakerHlsl::initialize()
 {
-    return TextureBaker::initialize();
+    if (!TextureBaker::initialize())
+    {
+        return false;
+    }
+
+    // Initialize D3D12 resources if hardware rendering is requested
+    if (_renderer->hwRequested())
+    {
+        Dx12Renderer* dx12Renderer = dynamic_cast<Dx12Renderer*>(_renderer.get());
+        if (!dx12Renderer)
+        {
+            return false;
+        }
+
+        _dx12Device = dx12Renderer->getDevice();
+        if (!_dx12Device)
+        {
+            return false;
+        }
+
+        // Create command allocator
+        HRESULT hr = _dx12Device->CreateCommandAllocator(
+            D3D12_COMMAND_LIST_TYPE_DIRECT,
+            IID_PPV_ARGS(&_dx12CommandAllocator));
+        if (FAILED(hr))
+        {
+            return false;
+        }
+
+        // Create command list
+        hr = dx12Renderer->createCommandList(&_dx12CommandList);
+        if (FAILED(hr) || !_dx12CommandList)
+        {
+            return false;
+        }
+
+        // Create descriptor heap for shader resource views
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+        heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+        heapDesc.NumDescriptors = 128;  // Support up to 128 textures
+        heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+        heapDesc.NodeMask = 0;
+
+        hr = _dx12Device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&_dx12DescriptorHeap));
+        if (FAILED(hr))
+        {
+            return false;
+        }
+
+        _descriptorHeapSize = _dx12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    }
+
+    return true;
 }
 
 bool TextureBakerHlsl::createTextureFromFile(const string& resourceId, const string& filePath, bool verticalFlip)
@@ -187,9 +254,24 @@ bool TextureBakerHlsl::createDx12Texture(const string& resourceId, const ImagePt
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     _dx12CommandList->ResourceBarrier(1, &barrier);
 
-    // Store the texture resource (as a TexturePtr wrapper would need custom implementation)
-    // For now, we'll create a placeholder texture entry
-    // In a full implementation, you'd create a Dx12Texture class that wraps this resource
+    // Create shader resource view
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = dxgiFormat;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.PlaneSlice = 0;
+    srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    // Allocate descriptor from heap
+    D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = _dx12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    cpuHandle.ptr += _textures.size() * _descriptorHeapSize;
+
+    _dx12Device->CreateShaderResourceView(textureResource.Get(), &srvDesc, cpuHandle);
+
+    // Store the texture resource
+    _textures[resourceId] = textureResource.Detach();
 
     return true;
 }
